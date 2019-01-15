@@ -1,0 +1,43 @@
+/****************************/
+/**********PSQL**************/
+/****************************/
+
+Connecting to PSQL as the default user
+--------------------------------------
+sudo -i -u postgres #first we change to the user postgres
+psql
+
+List databases
+--------------
+\l
+
+Select database
+---------------
+\c dbname
+
+List tables
+-----------
+\dt
+
+Describe table
+--------------
+\d tablename
+
+Exit PSQL
+---------
+\q
+
+Creating a user named sf (SmartFarm data dump's username)
+---------------------------------------------------------
+# assuming connected to psql as default user
+CREATE USER sf WITH PASSWORD 'password';
+CREATE DATABASE smartfarm;
+GRANT ALL PRIVILEGES ON DATABASE smartfarm to sf;
+
+Connecting to PSQL as the created user (no need to connect as default first)
+----------------------------------------------------------------------------
+psql -h localhost -U sf smartfarm #notice dbname is the last default option
+
+Import dump file to db
+----------------------
+psql -h localhost -U sf smartfarm < dumpfile
