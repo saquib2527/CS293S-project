@@ -102,6 +102,6 @@ class CIMISScraper:
 
 if __name__ == '__main__':
     cs = CIMISScraper()
-    #cs.get_stations()
-    cs.get_report_from_station()
+    cs.get_stations()
+    #cs.get_report_from_station()
     #cs.debug()
