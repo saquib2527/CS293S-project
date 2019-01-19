@@ -121,6 +121,23 @@ class CIMISScraper:
                 
         return 0
 
+    def aggregate_data(self):
+        hourly_csv_files = os.listdir(self.hourly_report_folder)
+        rows = []
+        header = ''
+        for csv_file in hourly_csv_files:
+            if not csv_file.endswith('csv'):
+                continue
+            station_number = csv_file.split('_')[0]
+            with open(os.path.join(self.hourly_report_folder, csv_file), 'r') as fh:
+                header = fh.readline()
+                for line in fh.readlines():
+                    rows.append('{0},{1}'.format(station_number, line))
+        header = 'StationNbr,{0}'.format(header)
+        with open(os.path.join(self.data_folder, 'aggregated_hourly_report.csv'), 'w') as fh:
+            fh.write(header)
+            for row in rows:
+                fh.write(row)
 
     def debug(self):
         """Prints debug statements during development"""

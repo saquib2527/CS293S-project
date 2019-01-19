@@ -28,9 +28,13 @@ class Driver:
             start_date = start_date + relativedelta(days=+61)
             end_date = end_date + relativedelta(days=+61)
 
+    def aggregate_data(self):
+        self.cs.aggregate_data()
+
     def debug(self):
         print(len(self.cs.station_numbers))
 
 if __name__ == '__main__':
     d = Driver()
-    d.get_N_years_hourly_data(5, datetime.datetime(2017, 7, 5))
+    # d.get_N_years_hourly_data(5, datetime.datetime(2017, 7, 5)
+    # d.aggregate_data()
