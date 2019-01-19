@@ -98,7 +98,10 @@ class CIMISScraper:
         """
         data_items = ','.join(x for x in self.features[27:]) #only the hourly features
         url = '{0}?appKey={1}&targets={2}&startDate={3}&endDate={4}&dataItems={5}'.format(self.report_url, self.app_key, station_number, start_date, end_date, data_items)
-        response = requests.get(url, headers=self.station_headers)
+        try:
+            response = requests.get(url, headers=self.station_headers)
+        except:
+            return 0
         data = json.loads(response.content)
         try:
             records = data['Data']['Providers'][0]['Records']
