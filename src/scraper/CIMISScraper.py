@@ -12,8 +12,14 @@ class CIMISScraper:
         self.report_url = 'http://et.water.ca.gov/api/data'
         self.station_headers = {'Accept': 'application/json'}
         self.data_folder = '../data'
+        self.hourly_report_folder = os.path.join(self.data_folder, 'hourly')
+        self.daily_report_folder = os.path.join(self.data_folder, 'daily')
         if not os.path.isdir(self.data_folder):
             os.mkdir(self.data_folder)
+        if not os.path.isdir(self.hourly_report_folder):
+            os.mkdir(self.hourly_report_folder)
+        if not os.path.isdir(self.daily_report_folder):
+            os.mkdir(self.daily_report_folder)
         self.station_filename = 'stations.csv'
         self.station_numbers = []
         self.features = [
@@ -44,7 +50,7 @@ class CIMISScraper:
                 "day-wind-ssw",
                 "day-wind-wnw",
                 "day-wind-wsw",
-                "hly-air-tmp",
+                "hly-air-tmp",          #27
                 "hly-dew-pnt",
                 "hly-eto",
                 "hly-net-rad",
@@ -63,6 +69,7 @@ class CIMISScraper:
     def get_stations(self):
         """Creates a CSV file (as initialized in init) containing active and ETo stations
             info includes station number, name, city, county, elevation, latitude, and longitude
+            note that it is required to call this function to populate valid stations
         """
         response = requests.get(self.station_url, headers=self.station_headers)
         data = json.loads(response.content)
@@ -85,23 +92,38 @@ class CIMISScraper:
                     fh.write(','.join('{}'.format(station[k].encode('utf-8')) for k in keys))
                     fh.write('\n')
 
-    def get_report_from_station(self, station_number=2, start_date='2015-01-01', end_date='2018-12-31'):
+    def get_hourly_report_from_station(self, station_number=2, start_date='2018-11-01', end_date='2018-12-31'):
         """Creates a CSV file with report from a single station as indicated by station_number
             details about API call can be found here: http://et.water.ca.gov/Rest/Index
         """
-
-        url = '{0}?appKey={1}&targets={2}&startDate={3}&endDate={4}&dataItems=day-eto'.format(self.report_url, self.app_key, station_number, start_date, end_date)
+        data_items = ','.join(x for x in self.features[27:]) #only the hourly features
+        url = '{0}?appKey={1}&targets={2}&startDate={3}&endDate={4}&dataItems={5}'.format(self.report_url, self.app_key, station_number, start_date, end_date, data_items)
         response = requests.get(url, headers=self.station_headers)
         data = json.loads(response.content)
-        print(json.dumps(data, indent=4))
+        try:
+            records = data['Data']['Providers'][0]['Records']
+        except:
+            return -1
+        keys = []
+        for x in self.features[27:]:
+            keys.append(''.join(y.capitalize() for y in x.split('-')))
+        with open(os.path.join(self.hourly_report_folder, '{0}_{1}_{2}.csv'.format(station_number, start_date, end_date)), 'w') as fh:
+            fh.write('{0},{1},{2}'.format(','.join(keys), 'Hour', 'Date'))
+            fh.write('\n')
+            for record in records:
+                row = ','.join('{}'.format(record[k]['Value']) for k in keys)
+                row = '{0},{1},{2}'.format(row, record['Hour'], record['Date'])
+                fh.write(row)
+                fh.write('\n')
+                
+        return 0
+
 
     def debug(self):
         """Prints debug statements during development"""
         
         print(self.station_numbers)
+        print(self.features[27:])
 
 if __name__ == '__main__':
-    cs = CIMISScraper()
-    cs.get_stations()
-    #cs.get_report_from_station()
-    #cs.debug()
+    print('please use Driver.py')
