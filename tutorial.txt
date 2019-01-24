@@ -41,3 +41,12 @@ psql -h localhost -U sf smartfarm #notice dbname is the last default option
 Import dump file to db
 ----------------------
 psql -h localhost -U sf smartfarm < dumpfile
+
+/****************************/
+/*******Pandas/Numpy*********/
+/****************************/
+
+Import df from csv with headers
+-------------------------------
+df = pd.read_csv('filename')
+

@@ -31,10 +31,14 @@ class Driver:
     def aggregate_data(self):
         self.cs.aggregate_data()
 
+    def preprocess_data(self, input_file, output_file):
+        self.cs.preprocess_data(input_file, output_file)
+
     def debug(self):
         print(len(self.cs.station_numbers))
 
 if __name__ == '__main__':
     d = Driver()
-    # d.get_N_years_hourly_data(5, datetime.datetime(2017, 7, 5)
+    # d.get_N_years_hourly_data(5, datetime.datetime(2017, 7, 5))
     # d.aggregate_data()
+    # d.preprocess_data('../data/aggregated_hourly_report.csv', '../data/hourly_report.csv')

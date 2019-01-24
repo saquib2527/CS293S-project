@@ -139,6 +139,24 @@ class CIMISScraper:
             for row in rows:
                 fh.write(row)
 
+    def preprocess_data(self, input_file, output_file):
+        with open(input_file, 'r') as fh:
+            header = fh.readline().split(',')
+            header.pop(6)
+            header = ','.join(header)
+            lines = fh.readlines()
+            final_data = []
+            for x in range(len(lines)):
+                lines[x] = lines[x].split(',')
+                lines[x].pop(6)
+                lines[x] = ','.join(lines[x])
+                if 'None' not in lines[x]:
+                    final_data.append(lines[x])
+        with open(output_file, 'w') as fh:
+            fh.write(header)
+            for row in final_data:
+                fh.write(row)
+
     def debug(self):
         """Prints debug statements during development"""
         
