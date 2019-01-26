@@ -3,7 +3,8 @@ from operator import itemgetter
 
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix
+from sklearn.neural_network import MLPRegressor
 
 import pandas as pd
 import numpy as np
@@ -16,7 +17,7 @@ class Classifier:
         self.distance_file = '../data/distances.csv'
         self.df = pd.read_csv(self.data_file)
         self.target = 'HlyEto'
-        self.features = ['HlyAirTmp', 'HlySolRad', 'HlySoilTmp', 'HlyRelHum']
+        self.features = ['HlyAirTmp', 'HlyVapPres', 'HlyNetRad', 'HlyWindSpd']
         self.stations = pd.read_csv(self.stations_file)
         self.distances = {}
 
@@ -81,14 +82,40 @@ class Classifier:
         print('correct: {0} incorrect: {1}'.format(correct, incorrect))
 
     def linear_regression(self):
+        #self.df.HlyAirTmp = (self.df.HlyAirTmp - 32) * (5.0 / 9.0) + 273
+        #self.df.HlyNetRad = (self.df.HlyNetRad / (60 * 24)) * 697.3
+        #self.df.HlyWindSpd = self.df.HlyWindSpd * 0.44704
         train, test = train_test_split(self.df, test_size=0.2)
+        #reg = MLPRegressor()
         reg = linear_model.LinearRegression()
+        #reg = linear_model.Ridge(alpha=0.5)
+        #reg = linear_model.Lasso(alpha=0.1)
+        #reg = linear_model.BayesianRidge()
         reg.fit(train[self.features], train[self.target])
         predictedY = reg.predict(test[self.features])
-        print(mean_squared_error(test[self.target], predictedY))
+        for x in range(len(predictedY)):
+            if predictedY[x] < 0:
+                predictedY[x] = 0
+            else:
+                predictedY[x] = round(predictedY[x], 2)
+        correct = incorrect = 0
+        vals = pd.unique(test[self.target])
+        cm = {}
+        for val in vals:
+            cm[val] = {}
         for pY, tY in zip(predictedY, test[self.target]):
-            print('{0} {1}'.format(pY, tY))
-        #print(reg.coef_)
+            if pY == tY:
+                correct += 1
+            else:
+                incorrect += 1
+            if pY in cm[tY]:
+                cm[tY][pY] += 1
+            else:
+                cm[tY][pY] = 1
+        #labels = np.union1d(pd.unique(predictedY), pd.unique(test[self.target])) * 100
+        for key in cm:
+            print('{0} {1}'.format(key, cm[key]))
+        print('{0} {1} {2}'.format(correct, incorrect, (float(correct) * 100) / (correct + incorrect)))
         pass
 
     def fahrenheit_to_celsius(self, temp):
@@ -129,8 +156,8 @@ class Classifier:
 
 if __name__ == '__main__':
     c = Classifier()
-    c.CIMIS_penman()
+    #c.CIMIS_penman()
     #c.geographically_nearest_classifier(1)
     #c.populate_nearest_neighbors()
-    #c.linear_regression()
+    c.linear_regression()
     #c.print_stats()
