@@ -156,8 +156,8 @@ class Classifier:
 
 if __name__ == '__main__':
     c = Classifier()
-    #c.CIMIS_penman()
+    c.CIMIS_penman()
     #c.geographically_nearest_classifier(1)
     #c.populate_nearest_neighbors()
-    c.linear_regression()
+    #c.linear_regression()
     #c.print_stats()
