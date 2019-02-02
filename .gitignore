@@ -1,3 +1,7 @@
+src/bin
+src/include
+src/lib
+src/local
 *.aux
 *.log
 *.toc

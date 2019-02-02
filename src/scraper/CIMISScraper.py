@@ -92,15 +92,16 @@ class CIMISScraper:
                     fh.write(','.join('{}'.format(station[k].encode('utf-8')) for k in keys))
                     fh.write('\n')
 
-    def get_hourly_report_from_station(self, station_number=2, start_date='2018-11-01', end_date='2018-12-31'):
+    def get_hourly_report_from_station(self, station_number=2, start_date='2018-01-01', end_date='2018-01-01'):
         """Creates a CSV file with report from a single station as indicated by station_number
             details about API call can be found here: http://et.water.ca.gov/Rest/Index
         """
         data_items = ','.join(x for x in self.features[27:]) #only the hourly features
-        url = '{0}?appKey={1}&targets={2}&startDate={3}&endDate={4}&dataItems={5}'.format(self.report_url, self.app_key, station_number, start_date, end_date, data_items)
+        url = '{0}?appKey={1}&unitOfMeasure=M&targets={2}&startDate={3}&endDate={4}&dataItems={5}'.format(self.report_url, self.app_key, station_number, start_date, end_date, data_items)
         try:
             response = requests.get(url, headers=self.station_headers)
         except:
+            print('Could not get data from station {0} for dates {1} to {2}'.format(station_number, start_date, end_date))
             return 0
         data = json.loads(response.content)
         try:
