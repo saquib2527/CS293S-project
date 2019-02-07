@@ -1,0 +1,19 @@
+<html>
+<head>
+    <script src="{{url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
+    <script src="{{url_for('static', filename='leaflet/leaflet.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='leaflet/leaflet.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='app.css')}}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+</head>
+<body>
+    <h1>ET</h1>
+    <div id="llmap"></div>
+    <div id="chosenStns"></div>
+
+    <input type="button" id="getData" value="Show" />
+    <div id="dataContainer"></div>
+
+    <script src="{{url_for('static', filename='app.js')}}"></script>
+</body>
