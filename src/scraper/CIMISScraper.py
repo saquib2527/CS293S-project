@@ -66,6 +66,13 @@ class CIMISScraper:
                 "hly-wind-spd"
                 ]
 
+    def get_non_eto_stations(self):
+        response = requests.get(self.station_url, headers=self.station_headers)
+        data = json.loads(response.content)
+        for station in data['Stations']:
+                if((station['IsActive'] == 'True') and (station['IsEtoStation'] == 'False')):
+                    print(station['StationNbr'])
+
     def get_stations(self):
         """Creates a CSV file (as initialized in init) containing active and ETo stations
             info includes station number, name, city, county, elevation, latitude, and longitude
@@ -165,4 +172,6 @@ class CIMISScraper:
         print(self.features[27:])
 
 if __name__ == '__main__':
+    cs = CIMISScraper()
+    cs.get_non_eto_stations()
     print('please use Driver.py')

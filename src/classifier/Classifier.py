@@ -27,6 +27,10 @@ class Classifier:
         self.features = ['HlyAirTmp', 'HlyVapPres', 'HlyNetRad', 'HlyWindSpd', 'HlyRelHum']
         self.stations = pd.read_csv(self.stations_file)
         self.distances = {}
+        # optimization
+        self.station_wise_df = {}
+        for sn in self.stations['StationNbr']:
+            self.station_wise_df[sn] = self.df[self.df['StationNbr'] == sn]
 
     def populate_nearest_neighbors(self):
         stations = self.stations
@@ -60,21 +64,25 @@ class Classifier:
         
         asd = 0
         MSE = 0
-        for i in range(len(self.df)):
-            station_number = self.df.iloc[i]['StationNbr']
-            date = self.df.iloc[i]['Date']
-            hour = self.df.iloc[i]['Hour']
+        #for i in range(len(self.df)):
+        for i, record in self.df.iterrows():
+            station_number = record['StationNbr']
+            date = record['Date']
+            hour = record['Hour']
+            # df_oi = self.df[(self.df['Date'] == date) & (self.df['Hour'] == hour)]
             found = 0
             idx = 0
             eto = []
             dis = []
             while found != n:
-                s_n = self.distances[station_number][idx]['StationNbr']
-                idx += 1
-                if idx == 135:
+                if idx == 136:
                     print('searched all, did not find {0}, only {1}'.format(n, found))
                     break
-                row = self.df[(self.df['StationNbr'] == s_n) & (self.df['Date'] == date) & (self.df['Hour'] == hour)]
+                s_n = self.distances[station_number][idx]['StationNbr']
+                idx += 1
+                #row = self.df[(self.df['StationNbr'] == s_n) & (self.df['Date'] == date) & (self.df['Hour'] == hour)]
+                #row = df_oi[self.df['StationNbr'] == s_n]
+                row = self.station_wise_df[s_n][(self.station_wise_df[s_n]['Date'] == date) & (self.station_wise_df[s_n]['Hour'] == hour)]
                 if len(row) == 1:
                     eto.append(row.iloc[0]['HlyEto'])
                     dis.append(self.distances[station_number][idx]['Distance'])
@@ -94,7 +102,7 @@ class Classifier:
             actual = self.df.iloc[i]['HlyEto']
             MSE += (actual - predicted) * (actual - predicted)
             asd += 1
-            if asd == 1000:
+            if asd == 20000:
                 break
         MSE /= asd
         print('n: {0} metric: {1} MSE: {2}'.format(n, metric, MSE))
@@ -205,16 +213,16 @@ if __name__ == '__main__':
     #c.penman()
 
 
-    #for metric_type in ['average', 'idw']:
-    #    for x in range(1, 6):
-    #        c.geographically_nearest_classifier(x, metric_type)
+    for metric_type in ['average', 'idw']:
+        for x in range(1, 6):
+            c.geographically_nearest_classifier(x, metric_type)
 
-    c.regression(c.features, 'linear')
-    for x in range(len(c.features)):
-        features = c.features[:]
-        print('leaving out {0}'.format(features[x]))
-        features.pop(x)
-        c.regression(features, 'linear')
+    #c.regression(c.features, 'linear')
+    #for x in range(len(c.features)):
+    #    features = c.features[:]
+    #    print('leaving out {0}'.format(features[x]))
+    #    features.pop(x)
+    #    c.regression(features, 'linear')
 
     end = time.time()
     print(end - start)

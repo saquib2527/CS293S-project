@@ -1,0 +1,48 @@
+\documentclass{beamer}
+
+\usepackage{tikz}
+\usetikzlibrary{er}
+
+\mode<presentation>{
+	\usetheme{Madrid}
+	\usecolortheme{whale}
+	\setbeamercovered{transparent}
+}
+
+\title[gTrack]{{\small CS293S: Internet of Things}\\An In-Depth Analysis on Weather Data from CIMIS}
+\author[TheShambles]{Nazmus Saquib \and Udit Paul \and Alex Ermakov \and Santha Ramamoorthy}
+\institute[CS grads, UCSB]{Graduate Students\\
+Department of Computer Science\\
+University of California Santa Barbara}
+\titlegraphic{\includegraphics[width=0.2\textwidth]{ucsb-logo.png}}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+\newcommand{\continued}{\textit{(Cntd.)}}
+%titlepage
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+	\frametitle{Outline}
+	\tableofcontents
+\end{frame}
+
+%\input{motivation}
+%\input{introduction}
+%\input{erd}
+%\input{demo}
+%\input{setup}
+%\input{results}
+%\input{conclusions}
+\input{questions}
+
+\end{document}
