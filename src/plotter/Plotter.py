@@ -65,6 +65,7 @@ class Plotter:
         return hour
 
     def plot_hourly_eto_by_station_date(self, station_nbr, date, check_missing_data=True):
+        filename = 'hourly-eto-' + str(station_nbr) + '-' + date + '.' + self.image_format
         df = self.df[(self.df['StationNbr'] == station_nbr) & (self.df['Date'] == date)]
         df = df.sort_values(by=['Hour'])
         if df.shape[0] != 24:
@@ -93,9 +94,10 @@ class Plotter:
         plt.ylabel('ETo (mm)')
         plt.title('Hourly ETo values for station {0} on {1}'.format(station_nbr, date))
         plt.tight_layout()
-        plt.show()
+        plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
 
     def plot_hourly_mean(self, filename='mean-of-hourly-eto-values'):
+        filename = filename + '.' + self.image_format
         hour_group = self.df[['Hour', 'HlyEto']].groupby(['Hour'])
         hours = self.df.Hour.unique()
         x = []
@@ -113,6 +115,7 @@ class Plotter:
         plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
 
     def plot_hourly_summary(self, filename='summary-hourly-eto-values'):
+        filename = filename + '.' + self.image_format
         hour_group = self.df[['Hour', 'HlyEto']].groupby(['Hour'])
         hours = self.df.Hour.unique()
         criteria = ['min', 'max', 'mean']
@@ -137,6 +140,7 @@ class Plotter:
         plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
 
     def plot_soi_latitude_hourly_summary(self, filename='soi-latitude-mean-of-hourly-eto-values'):
+        filename = filename + '.' + self.image_format
         X = []
         Y = []
         label = ['south', 'middle', 'north']
@@ -161,13 +165,13 @@ class Plotter:
         plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
 
     def plot_scatterplot_matrix(self, features=['HlyAirTmp', 'HlyVapPres', 'HlyWindSpd', 'HlyNetRad'], target='HlyEto'):
-        filename = 'scatterplot-matrix-' + '-'.join(features)
+        filename = 'scatterplot-matrix-' + '-'.join(features) + '.' + self.image_format
         scatter_matrix(self.df[features], rasterized=True)
         plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
         #plt.show()
 
     def get_regression_result(self, features=['HlyAirTmp', 'HlyVapPres', 'HlyWindSpd', 'HlyNetRad'], target='HlyEto'):
-        filename = 'regression-' + '-'.join(features)
+        filename = 'regression-' + '-'.join(features) + '.' + self.image_format
         train, test = train_test_split(self.df, test_size=0.2)
         reg = linear_model.LinearRegression()
         reg.fit(train[features], train[target])
@@ -204,7 +208,7 @@ class Plotter:
         with open(filename, 'w') as fh:
             fh.write('{0}'.format(table))
 
-    def plot_soi_nearest_distance(self, k=1):
+    def get_soi_nearest_distance(self, k=1):
         label = ['nearest', 'middle', 'farthest']
         print('station,k,average,idw')
         for station in self.soi_nearest_distance: #for each station of interest
@@ -248,6 +252,9 @@ class Plotter:
                     error_idw += (actual - (predicted_idw / denominator)) ** 2
                     count += 1
             #print('target: {0} target size: {1} num of absent neighbors: {2}'.format(station, target_df.shape[0], absent_neighbors))
+            if count == 0:
+                print('no rows found with all neighbors!!! abort')
+                return
             error_average /= count
             error_idw /= count
             #print('average: {0} IDW: {1}'.format(error_average, error_idw)))
@@ -296,6 +303,39 @@ class Plotter:
         self.soi_nearest_distance.append(mid_station)
         self.soi_nearest_distance.append(temp[-1]['StationNbr'])
 
+    def plot_hist_eto(self):
+        filename = 'hist-eto.eps'
+        a = self.df['HlyEto'].tolist()
+        bins = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.6]
+        plt.hist(a, bins, edgecolor='black', linewidth=1.2)
+        plt.xlabel('count of records')
+        plt.ylabel('ETo (mm)')
+        plt.yticks(rotation=45)
+        plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
+
+    def plot_soi_nearest_distance(self):
+        filename = 'soi-nearest-distance.eps'
+        stations = self.soi_nearest_distance
+        df = pd.read_csv('nn.csv')
+        num_neighbors = sorted(list(df.k.unique()))
+        idx = 0
+        color = ['g', 'b', 'r']
+        label = ['closest', 'center', 'farthest']
+        for station in stations:
+            y_average = []
+            y_idw = []
+            for num in num_neighbors:
+                y_average.append(df[(df['station'] == int(station)) & (df['k'] == num)]['average'].iloc[0])
+                y_idw.append(df[(df['station'] == int(station)) & (df['k'] == num)]['idw'].iloc[0])
+            plt.plot(num_neighbors, y_average, color=color[idx], linestyle='dashed', label=label[idx] + ' average')
+            plt.plot(num_neighbors, y_idw, color=color[idx], label=label[idx] + ' IDW')
+            idx += 1
+        plt.ylim(0,0.0125)
+        plt.xlabel('number of nearest neighbor')
+        plt.ylabel('mean squared error')
+        plt.legend(loc='upper left')
+        plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
+
     def stat(self):
         print(self.df.shape)
 
@@ -304,13 +344,16 @@ if __name__ == '__main__':
     start = time.time()
     
     p = Plotter()
+    #p.plot_hourly_eto_by_station_date(2, '2018-01-01')
     #p.plot_hourly_mean()
     #p.plot_hourly_summary()
     #p.plot_soi_latitude_hourly_summary()
     #p.plot_scatterplot_matrix()
     #p.get_regression_result_all_combo()
-    for k in range(1,6):
-        p.plot_soi_nearest_distance(k)
+    #for k in range(1,5):
+    #    p.get_soi_nearest_distance(k)
+    #p.plot_hist_eto()
+    p.plot_soi_nearest_distance()
 
     end = time.time()
     print('elapsed time: {0} seconds'.format(end - start))

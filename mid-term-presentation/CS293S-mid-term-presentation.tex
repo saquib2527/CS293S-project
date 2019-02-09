@@ -9,7 +9,7 @@
 	\setbeamercovered{transparent}
 }
 
-\title[gTrack]{{\small CS293S: Internet of Things}\\An In-Depth Analysis on Weather Data from CIMIS}
+\title[gTrack]{{\small CS293S: Internet of Things}\\An In-Depth Analysis on Weather Data from CIMIS: Estimating Evapotranspiration (ET) Values}
 \author[TheShambles]{Nazmus Saquib \and Udit Paul \and Alex Ermakov \and Santha Ramamoorthy}
 \institute[CS grads, UCSB]{Graduate Students\\
 Department of Computer Science\\
@@ -26,6 +26,9 @@ University of California Santa Barbara}
 
 \begin{document}
 \newcommand{\continued}{\textit{(Cntd.)}}
+\newcommand{\tikzstatement}[1]{\tikz\node[draw, align=center,minimum width=12cm,minimum height=1cm,fill=blue!20, text width=12cm]{#1};}
+\newcommand{\tikzproblem}[1]{\tikz\node[draw, align=center,minimum width=12cm,minimum height=1cm,fill=red!20, text width=12cm]{#1};}
+\newcommand{\tikzsolution}[1]{\tikz\node[draw, align=center,minimum width=12cm,minimum height=1cm,fill=green!20, text width=12cm]{#1};}
 %titlepage
 \begin{frame}
 \titlepage
@@ -36,13 +39,12 @@ University of California Santa Barbara}
 	\tableofcontents
 \end{frame}
 
-%\input{motivation}
-%\input{introduction}
-%\input{erd}
-%\input{demo}
-%\input{setup}
-%\input{results}
-%\input{conclusions}
+\input{introduction}
+\input{data-collection}
+\input{data-overview}
+\input{regression}
+\input{nearest-neighbor}
+\input{conclusion}
 \input{questions}
 
 \end{document}
