@@ -95,7 +95,7 @@ class Plotter:
         plt.tight_layout()
         plt.show()
 
-    def plot_hourly_summary(self, filename='mean-of-hourly-eto-values'):
+    def plot_hourly_mean(self, filename='mean-of-hourly-eto-values'):
         hour_group = self.df[['Hour', 'HlyEto']].groupby(['Hour'])
         hours = self.df.Hour.unique()
         x = []
@@ -109,6 +109,30 @@ class Plotter:
         plt.xlabel('time (hour)')
         plt.ylabel('ETo (mm)')
         plt.title('Mean hourly ETo values')
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
+
+    def plot_hourly_summary(self, filename='summary-hourly-eto-values'):
+        hour_group = self.df[['Hour', 'HlyEto']].groupby(['Hour'])
+        hours = self.df.Hour.unique()
+        criteria = ['min', 'max', 'mean']
+        for c in criteria:
+            x = []
+            y = []
+            for hour in hours:
+                x.append(self.hour_to_string(hour))
+                if c == 'mean':
+                    y.append(hour_group.get_group(hour).mean()['HlyEto'])
+                elif c == 'min':
+                    y.append(hour_group.get_group(hour).min()['HlyEto'])
+                elif c == 'max':
+                    y.append(hour_group.get_group(hour).max()['HlyEto'])
+            plt.plot(x, y, marker='o',label=c)
+        plt.xticks(rotation=45)
+        plt.xlabel('time (hour)')
+        plt.ylabel('ETo (mm)')
+        plt.title('hourly ETo summary')
+        plt.legend()
         plt.tight_layout()
         plt.savefig(os.path.join(self.image_folder, filename), format=self.image_format)
 
@@ -180,6 +204,55 @@ class Plotter:
         with open(filename, 'w') as fh:
             fh.write('{0}'.format(table))
 
+    def plot_soi_nearest_distance(self, k=1):
+        label = ['nearest', 'middle', 'farthest']
+        print('station,k,average,idw')
+        for station in self.soi_nearest_distance: #for each station of interest
+            target_df = self.df[self.df['StationNbr'] == int(station)]
+            #print('target df size: {0}'.format(target_df.shape[0]))
+            absent_neighbors = 0
+            nearest_neighbor = []
+            nearest_distance = []
+            for n in range(k):
+                nearest_neighbor.append(self.distances[station][n]['StationNbr'])
+                nearest_distance.append(self.distances[station][n]['distance'])
+            neighbor_df = self.df[self.df['StationNbr'].isin(nearest_neighbor)]
+            error_average = 0
+            error_idw = 0
+            count = 0
+            for index, row in target_df.iterrows(): #for each row of target station
+                all_neighbors_present = True
+                d = row['Date']
+                h = row['Hour']
+                predicted_average = 0
+                temp_predicted_average = 0
+                predicted_idw = 0
+                temp_predicted_idw = 0
+                for idx in range(k): #iterate over each neighbor
+                    neighbor_row = neighbor_df[(neighbor_df['Date'] == d) & (neighbor_df['Hour'] == h) & (neighbor_df['StationNbr'] == nearest_neighbor[idx])]
+                    if not neighbor_row.empty: #if neighbor present
+                        temp_predicted_average = neighbor_row.iloc[0]['HlyEto']
+                        predicted_average += temp_predicted_average
+                        temp_predicted_idw = neighbor_row.iloc[0]['HlyEto'] * (1 / nearest_distance[idx])
+                        predicted_idw += temp_predicted_idw
+                    else:
+                        all_neighbors_present = False
+                        absent_neighbors += 1
+                        break
+                if all_neighbors_present:
+                    actual = row['HlyEto']
+                    error_average += (actual - (predicted_average / k)) ** 2
+                    denominator = 0
+                    for idx in range(k):
+                        denominator += (1 / nearest_distance[idx])
+                    error_idw += (actual - (predicted_idw / denominator)) ** 2
+                    count += 1
+            #print('target: {0} target size: {1} num of absent neighbors: {2}'.format(station, target_df.shape[0], absent_neighbors))
+            error_average /= count
+            error_idw /= count
+            #print('average: {0} IDW: {1}'.format(error_average, error_idw)))
+            print('{0},{1},{2},{3}'.format(station,k,error_average,error_idw))
+
     def find_soi(self):
         '''
         finds Stations of Interest:
@@ -231,10 +304,13 @@ if __name__ == '__main__':
     start = time.time()
     
     p = Plotter()
+    #p.plot_hourly_mean()
     #p.plot_hourly_summary()
     #p.plot_soi_latitude_hourly_summary()
     #p.plot_scatterplot_matrix()
-    p.get_regression_result_all_combo()
+    #p.get_regression_result_all_combo()
+    for k in range(1,6):
+        p.plot_soi_nearest_distance(k)
 
     end = time.time()
     print('elapsed time: {0} seconds'.format(end - start))
