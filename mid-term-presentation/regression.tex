@@ -2,11 +2,13 @@
 \begin{frame}
 \frametitle{Estimation of ET Values}
 \tikzproblem{Given a set of features, can we estimate ET?}
-\begin{itemize}
+\onslide<2->{
+\begin{itemize}[<+->]
 \setlength\itemsep{1em}
 \item Which features to choose?
 \item \textit{How well} is our estimate?
 \end{itemize}
+}
 \end{frame}
 
 \begin{frame}
@@ -14,6 +16,7 @@
 \begin{equation*}
 \boxed{ET_o = \frac{\bigtriangleup(R_n-G)}{\lambda[\bigtriangleup+\gamma(1+C_du_2)]} + \frac{\gamma\frac{37}{T_a+273.16}u_2(e_s-e_a)}{\bigtriangleup+\gamma(1+C_du_2)}}
 \end{equation*}
+\onslide<2->{
 \tikzstatement{Ultimately depends on four weather features}
 \begin{itemize}
 \setlength\itemsep{1em}
@@ -22,6 +25,7 @@
 \item Air temperature
 \item Wind speed
 \end{itemize}
+}
 \end{frame}
 
 \begin{frame}
@@ -52,7 +56,7 @@ HlyNetRad,HlyWindSpd & 0.0024909080494 & 0.951659909255\\
 \hline
 HlyNetRad,HlyVapPres & 0.00302176798112 & 0.941065800356\\
 \hline
-HlyNetRad & 0.00304665078019 & 0.940955854127\\
+\only<1>{HlyNetRad}\only<2>{\fcolorbox{red}{white}{HlyNetRad}} & 0.00304665078019 & 0.940955854127\\
 \hline
 HlyAirTmp,HlyVapPres,HlyWindSpd & 0.0236668111725 & 0.540318481\\
 \hline

@@ -2,11 +2,13 @@
 \begin{frame}
 \frametitle{Nearest Neighbor Analysis}
 \tikzproblem{Given the ET value of $k$ nearest stations of a place, can we estimate ET?}
+\onslide<2>{
 \begin{itemize}
 \setlength\itemsep{1em}
 \item Arithmetic mean of $k$ values
 \item Inverse Distance Weighted (IDW) average of $k$ values
 \end{itemize}
+}
 \end{frame}
 
 \begin{frame}
@@ -73,6 +75,8 @@
 \item Some stations are sparsely located, some are densely located
 \item Distance to $n$th nearest station for different stations might vary widely
 \end{itemize}
-\tikzproblem{What is an optimal value of $R$ such that $k\prime$ stations\\ within that radius gives best overall estimates?}
-\tikzsolution{future work $\ldots$}
+\onslide<2>{
+\tikzproblem{What is an optimal value of radius $R$ such that $k\prime$ stations\\ within that radius gives best overall estimates?}
+\tikzsolution{work in progress$\ldots$}
+}
 \end{frame}
