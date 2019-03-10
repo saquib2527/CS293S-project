@@ -1,0 +1,7 @@
+<p>
+{% if result != None %}
+<img src="data:image/png;base64,{{ result }}" height="350">
+{% else %}
+<span>All hourly data not present, select another station/date</span>
+{% endif %}
+</p>
