@@ -69,6 +69,49 @@
 \end{frame}
 
 \begin{frame}
+\frametitle{Nearest Neighbor with Sensor Values}
+\onslide<1->{\tikzproblem{What if we have sensor values from nearby stations instead of only ET values?}}
+\onslide<2->{\tikzsolution{MSE decreases according to CIMIS Penman Equation}}
+~\\
+\onslide<3->{\tikzproblem{What if we have sensor values from nearby stations \textbf{along with local air temperature?}}}
+\onslide<4>{\tikzsolution{MSE decreases even further}}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nearest Neighbor with Sensor Values \continued}
+\centering
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+	\textbf{Stn No} & \textbf{Num of Nbrs} & \textbf{MSE IDW} & \textbf{MSE} &\textbf{MSE Local}\\
+\hline
+234 & 1 & 0.00437018 & 0.00085818 & 0.00001899\\
+\hline
+234 & 2 & 0.00730456 & 0.00401320 & 0.00002029\\
+\hline
+234 & 3 & 0.00863260 & 0.00480052 & 0.00002029\\
+\hline
+234 & 4 & 0.00878339 & 0.00284048 & 0.00002034\\
+\hline
+129 & 1 & 0.00083297 & 0.00023209 & 0.00000650\\
+\hline
+129 & 2 & 0.00062087 & 0.00037144 & 0.00000649\\
+\hline
+129 & 3 & 0.00059676 & 0.00028950 & 0.00000649\\
+\hline
+129 & 4 & 0.00063999 & 0.00042391 & 0.00000650\\
+\hline
+57 & 1 & 0.00451400 & 0.00044228 & 0.00000982\\
+\hline
+57 & 2 & 0.00371546 & 0.00051686 & 0.00000982\\
+\hline
+57 & 3 & 0.00334925 & 0.00031521 & 0.00000982\\
+\hline
+57 & 4 & 0.00357201 & 0.00042077 & 0.00000983\\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}
 \frametitle{A Different Approach to Nearest Neighbor}
 \begin{itemize}
 \setlength\itemsep{1em}
@@ -77,6 +120,6 @@
 \end{itemize}
 \onslide<2>{
 \tikzproblem{What is an optimal value of radius $R$ such that $k\prime$ stations\\ within that radius gives best overall estimates?}
-\tikzsolution{work in progress$\ldots$}
+\tikzsolution{Future Work$\ldots$}
 }
 \end{frame}
