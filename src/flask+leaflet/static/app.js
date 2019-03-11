@@ -84,6 +84,34 @@ function getChosenStns() {
     return stations
 }
 
+
+// function addHeatmap() {
+//     var testData = {
+//       max: 8,
+//       data: [{lat: 36.336222, lng:-120.112910, count: 1},{lat: 35.532556, lng:-119.28179, count: 1}]
+//     };
+
+//     var cfg = {
+//       "radius": 2,
+//       "maxOpacity": .8, 
+//       "scaleRadius": true, 
+//       "useLocalExtrema": true,
+//       latField: 'lat',
+//       lngField: 'lng',
+//       valueField: 'count'
+//     };
+
+//     var heatmapLayer = new HeatmapOverlay(cfg);
+//     heatmapLayer.setData(testData);
+//     mymap.addLayer(heatmapLayer);
+//     setTimeout(function(){
+//           mymap.removeLayer(heatmapLayer);      
+//     }, 5000);
+
+
+// }
+
+
 $(function() {
     makeMap();
     renderData();
@@ -185,8 +213,5 @@ $(function() {
     })
 
     
-
-    
-
 
 })
